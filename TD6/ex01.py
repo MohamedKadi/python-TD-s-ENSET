@@ -36,6 +36,13 @@ solutions = solve((2*x-3*y-5,-x+2*y+3),(x,y))
 print(solutions[x])
 print(solutions[y])
 
-#Question 7 
-#derivation1 = diff(x**3 - 6*x**2 + 5*x + 12, x)
-#derivation2 = diff(x**3 - 6*x**2 + 5*x + 12, x)
+#Question 7
+from sympy import symbols, Function, dsolve, Eq, Derivative
+
+x = symbols('x')
+y = Function('y')
+
+diff_eq = Eq(Derivative(y(x), x) - y(x), x**2)
+
+solution = dsolve(diff_eq, y(x))
+print(solution)
