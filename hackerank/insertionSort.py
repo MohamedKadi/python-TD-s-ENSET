@@ -10,16 +10,15 @@ output:
 2 3 4 6 8 
 """
 
+
 def insertionSort1(n, arr):
     max = n-1
     last = arr[max]
-    while max > 0:
-        if(arr[max-1] < last):
-            arr[max] = last
-            print(str(arr))
-            break
-        arr[max] = arr[max-1]
-        print(arr)
+    while max > 0 and arr[max - 1] > last:
+        arr[max] = arr[max - 1]
+        print(*arr)
         max -= 1
+    arr[max] = last
+    print(*arr)
 
-insertionSort1(5, [2, 4, 6, 8, 3])
+insertionSort1(5, [2, 4, 6, 8, 0])
