@@ -10,7 +10,7 @@ sol = """4487-9581,755745207-755766099,954895848-955063124,4358832-4497315,15-47
 def validProducts(nums_arr):
     sum = 0
     for i in nums_arr:
-        print(i)
+        #print(i)
         num = i.split("-")
 
         first_num = num[0]
