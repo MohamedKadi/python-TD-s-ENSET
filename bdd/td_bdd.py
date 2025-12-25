@@ -179,7 +179,7 @@ def FermerConnex(conn):
     conn.close()
     print("Connexion fermée.")
 
-
+"""
 if __name__ == "__main__":
     maBase = 'cinema.sqlite'
     
@@ -210,3 +210,4 @@ if __name__ == "__main__":
     print(f"Nombre: {Nbr_acteurs(c, 'Inception')}")
     
     FermerConnex(conn)
+"""
