@@ -1,7 +1,7 @@
 from PIL import Image
 
 # Input / Output images
-input_path = r"C:\Users\moham\Desktop\learning projects\python\TD9\input.png"
+input_path = r"C:\Users\moham\Desktop\learning projects\python\TD9\input.jpg"
 output_path = r"C:\Users\moham\Desktop\learning projects\python\TD9\output1.png"
 
 # How close to black a pixel must be to remove it (0 = remove only pure black, higher = remove dark tones)

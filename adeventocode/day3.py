@@ -251,7 +251,18 @@ def solved_day3(array_joltage):
             sum += int(max)*10 + int(max_two)
     return sum
 
-
 array = sol.split("\n")
 
 print(solved_day3(array))
+
+#def solved_day3_part2(array_banks):
+
+"""
+the idea that i have rn is im going to do a dict for indexes
+then count how many each num got repeated in the big num 
+then start from 9 and start substracting til 0 then move to 8 7 6 etc...
+"""
+nums_dict = {
+
+}
+

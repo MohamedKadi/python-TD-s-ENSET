@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Independent Robot & Camera</title>
+  <style>
+    body { margin: 0; background: #111; color: #fff; font-family: sans-serif; }
+    canvas { display: block; margin: auto; background: #222; }
+    #info { text-align: center; padding: 10px; }
+    kbd { background: #444; padding: 2px 6px; border-radius: 4px; font-family: monospace; }
+  </style>
+</head>
+<body>
+<div id="info">
+  <b>Q / D</b> to rotate Robot Body &nbsp;|&nbsp; 
+  <b>Left / Right</b> to rotate Camera Line
+</div>
+<canvas id="game" width="800" height="600"></canvas>
+
+<script>
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+
+// --- LOAD IMAGE ---
+const robotImg = new Image();
+robotImg.src = 'https://img.icons8.com/color/96/robot-2.png'; 
+
+// World settings
+const WORLD_WIDTH = 2000;
+const WORLD_HEIGHT = 2000;
+
+// Robot (Body)
+const robot = {
+  x: WORLD_WIDTH / 2,
+  y: WORLD_HEIGHT / 2,
+  radius: 20,
+  angle: 0,         // Robot's body angle
+  rotateSpeed: 0.05
+};
+
+// Camera (Sensor/Turret)
+const camera = {
+  x: robot.x,
+  y: robot.y,
+  angle: 0,         // Camera's independent angle
+  rotateSpeed: 0.05
+};
+
+// Objects
+const objects = [];
+for (let i = 0; i < 20; i++) {
+  objects.push({
+    x: Math.random() * WORLD_WIDTH,
+    y: Math.random() * WORLD_HEIGHT,
+    radius: 15
+  });
+}
+
+// Input Handling
+const keys = {};
+window.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true); // Convert to lowercase to handle Q/q
+window.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+
+function update() {
+  // 1. Update Robot Body (Q and D)
+  if (keys['q']) {
+    robot.angle -= robot.rotateSpeed;
+  }
+  if (keys['d']) {
+    robot.angle += robot.rotateSpeed;
+  }
+
+  // 2. Update Camera/Line (Left and Right Arrows)
+  if (keys['arrowleft']) {
+    camera.angle -= camera.rotateSpeed;
+  }
+  if (keys['arrowright']) {
+    camera.angle += camera.rotateSpeed;
+  }
+
+  // 3. Keep Camera Position attached to Robot Position
+  camera.x = robot.x;
+  camera.y = robot.y;
+}
+
+function isDetected(obj) {
+  const dx = obj.x - camera.x;
+  const dy = obj.y - camera.y;
+  const distance = Math.hypot(dx, dy);
+  
+  // Angle from sensor to object
+  const angleToObj = Math.atan2(dy, dx);
+  
+  // IMPORTANT: Use camera.angle here, not robot.angle
+  let diff = angleToObj - camera.angle;
+  diff = Math.atan2(Math.sin(diff), Math.cos(diff));
+
+  if (Math.abs(diff) > Math.PI / 2) return false;
+
+  const perpendicularDist = Math.abs(Math.sin(diff) * distance);
+  return perpendicularDist < obj.radius;
+}
+
+function drawRotatedImage(img, x, y, width, height, angle) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(angle);
+  ctx.drawImage(img, -width/2, -height/2, width, height);
+  ctx.restore();
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const offsetX = canvas.width / 2 - robot.x;
+  const offsetY = canvas.height / 2 - robot.y;
+
+  ctx.save();
+  ctx.translate(offsetX, offsetY);
+
+  // Draw World Bounds
+  ctx.strokeStyle = '#444';
+  ctx.strokeRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+
+  // Draw Objects
+  objects.forEach(obj => {
+    const detected = isDetected(obj); // Check against Camera Line
+    ctx.fillStyle = detected ? '#ff3333' : '#666'; // Red if detected, Gray if not
+    ctx.beginPath();
+    ctx.arc(obj.x, obj.y, obj.radius, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // --- DRAW ROBOT (Body) ---
+  // Uses robot.angle (controlled by Q/D)
+  drawRotatedImage(robotImg, robot.x, robot.y, 60, 60, robot.angle);
+
+  // --- DRAW CAMERA (Line) ---
+  // Uses camera.angle (controlled by Arrows)
+  ctx.strokeStyle = 'yellow';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(camera.x, camera.y);
+  ctx.lineTo(
+    camera.x + Math.cos(camera.angle) * 4000, // Draw line to infinity
+    camera.y + Math.sin(camera.angle) * 4000
+  );
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+function loop() {
+  update();
+  draw();
+  requestAnimationFrame(loop);
+}
+
+loop();
+</script>
+</body>
+</html>
